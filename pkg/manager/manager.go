@@ -88,7 +88,11 @@ func New(configMap string, config *kubevip.Config) (*Manager, error) {
 			// If this is a control pane host it will likely have started as a static pod or won't have the
 			// VIP up before trying to connect to the API server, we set the API endpoint to this machine to
 			// ensure connectivity.
-			clientset, err = k8s.NewClientset(adminConfigPath, false, fmt.Sprintf("kubernetes:%v", config.Port))
+			hostname, err := os.Hostname()
+			if err != nil {
+				return nil, err
+			}
+			clientset, err = k8s.NewClientset(adminConfigPath, false, fmt.Sprintf("%s:%v", hostname, config.Port))
 		} else {
 			clientset, err = k8s.NewClientset(adminConfigPath, false, "")
 		}
